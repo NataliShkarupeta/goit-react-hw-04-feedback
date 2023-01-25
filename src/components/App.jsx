@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { Statistics, NameStatistics } from 'components/Statistics/Statistics';
 import { Container } from './Default/Default.styled';
 import {
@@ -8,58 +8,56 @@ import {
 import { Section } from 'components/Section/Section';
 import { Massage } from './Default/DefaultMassage';
 
-export class App extends Component {
-  state = {
-    good: 0,
-    neutral: 0,
-    bad: 0,
-  };
+export const App = () => {
+  const [good, setGood] = useState(0);
+  const [neutral, setNeutral] = useState(0);
+  const [bad, setBad] = useState(0);
 
-  countTotalFeedback = () => {
-    const { good, neutral, bad } = this.state;
+  const countTotalFeedback = () => {
     const total = good + neutral + bad;
     return total;
   };
 
-  countPositiveFeedbackPercentage = () => {
-    const { good } = this.state;
-    const positivePercentage = (good * 100) / this.countTotalFeedback();
+  const countPositiveFeedbackPercentage = () => {
+    const positivePercentage = (good * 100) / countTotalFeedback();
     return Math.round(positivePercentage);
   };
 
-  leaveReview = event => {
-    const key = event.target.name;
-
-    this.setState(prevState => ({
-      [key]: prevState[key] + 1,
-    }));
+  const leaveReview = ({ target }) => {
+    const { name } = target;
+    if (name === 'good') setGood(propValue => propValue + 1);
+    if (name === 'neutral') setNeutral(propValue => propValue + 1);
+    if (name === 'bad') setBad(propValue => propValue + 1);
   };
 
-  render() {
-    return (
-      <Container>
-        <Section>
-          <TitlFeedback />
-          <FeedbackOptions
-            options={['good', 'neutral', 'bad']}
-            onLeaveFeedback={this.leaveReview}
+
+  return (
+    <Container>
+      <Section>
+        <TitlFeedback />
+        <FeedbackOptions
+          options={['good', 'neutral', 'bad']}
+          onLeaveFeedback={leaveReview}
+        />
+      </Section>
+      <Section>
+        <NameStatistics />
+        {countTotalFeedback() !== 0 ? (
+          <Statistics
+            good={good}
+            neutral={neutral}
+            bad={bad}
+            total={countTotalFeedback()}
+            positivePercentage={countPositiveFeedbackPercentage()}
           />
-        </Section>
-        <Section>
-          <NameStatistics />
-          {this.countTotalFeedback() !== 0 ? (
-            <Statistics
-              good={this.state.good}
-              neutral={this.state.neutral}
-              bad={this.state.bad}
-              total={this.countTotalFeedback()}
-              positivePercentage={this.countPositiveFeedbackPercentage()}
-            />
-          ) : (
-            <Massage />
-          )}
-        </Section>
-      </Container>
-    );
-  }
-}
+        ) : (
+          <Massage />
+        )}
+      </Section>
+    </Container>
+  );
+};
+
+
+
+
